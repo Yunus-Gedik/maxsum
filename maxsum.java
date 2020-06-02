@@ -1,3 +1,10 @@
+/*
+java -version:
+    openjdk version "1.8.0_232"
+    OpenJDK Runtime Environment (AdoptOpenJDK)(build 1.8.0_232-b09)
+    OpenJDK 64-Bit Server VM (AdoptOpenJDK)(build 25.232-b09, mixed mode)
+*/
+
 import java.io.File; 
 import java.io.FileNotFoundException;
 import java.util.Scanner;
