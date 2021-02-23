@@ -1,2 +1,1 @@
-# piworks
-Technical Questionnaire - SW Development Intern
+This software had wrote for a technical questionnaire in Java.
