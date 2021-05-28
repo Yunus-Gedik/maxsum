@@ -7,10 +7,7 @@ java -version:
 
 import java.io.File; 
 import java.io.FileNotFoundException;
-import java.util.Scanner;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 
 
 class maxsum {
@@ -23,7 +20,10 @@ class maxsum {
             return;
         }
 
+        // Recursive brute force approach.
         System.out.println(max_wrapper(args[0]));
+        // Dynamic programming with bottom to top approach.
+        System.out.println(rollback(args[0]));
 
     }
 
@@ -63,7 +63,7 @@ class maxsum {
         while(sc.hasNextInt()){
 
             if(index == 0){
-                triangle.add( new ArrayList<Integer>(Arrays.asList(sc.nextInt())));
+                triangle.add( new ArrayList<Integer>(Collections.singletonList(sc.nextInt())));
             }
             else{
                 triangle.get(layer).add(sc.nextInt());
@@ -114,6 +114,42 @@ class maxsum {
                               max(layer+1, index,   accumulated) ) , 
                               max(layer+1, index+1, accumulated) )  ;
 
+    }
+
+    public static int rollback(String filename){
+        triangle = new ArrayList<List<Integer>>();
+        read_and_list(filename);
+
+        for(int i=triangle.size()-2; i >= 0; --i ){
+            for(int j=0; j<triangle.get(i).size(); ++j ){
+                if(prime(triangle.get(i).get(j)) ){
+                    triangle.get(i).set(j,0);
+                    continue;
+                }
+
+                int[] temp = {0,0,0};
+
+                if( j-1 >= 0 ){
+                    int consider = triangle.get(i+1).get(j-1);
+                    if( !prime(consider) ){
+                        temp[0] = consider;
+                    }
+                }
+                if( j+1 < triangle.get(i+1).size()){
+                    int consider = triangle.get(i+1).get(j+1);
+                    if( !prime(consider) ){
+                        temp[1] = consider;
+                    }
+                }
+                int consider = triangle.get(i+1).get(j);
+                if( !prime(consider) ){
+                    temp[2] = consider;
+                }
+                triangle.get(i).set(j,Math.max(Math.max(temp[0],temp[1]),temp[2]) + triangle.get(i).get(j));
+            }
+        }
+
+        return triangle.get(0).get(0);
     }
 
 }
