@@ -1,11 +1,11 @@
 /*
 java -version:
-    openjdk version "1.8.0_232"
-    OpenJDK Runtime Environment (AdoptOpenJDK)(build 1.8.0_232-b09)
-    OpenJDK 64-Bit Server VM (AdoptOpenJDK)(build 25.232-b09, mixed mode)
+    java version "1.8.0_291"
+    Java(TM) SE Runtime Environment (build 1.8.0_291-b10)
+    Java HotSpot(TM) 64-Bit Server VM (build 25.291-b10, mixed mode)
 */
 
-import java.io.File; 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 
@@ -21,7 +21,7 @@ class maxsum {
         }
 
         // Recursive brute force approach.
-        System.out.println(max_wrapper(args[0]));
+        System.out.println(max(args[0]));
         // Dynamic programming with bottom to top approach.
         System.out.println(rollback(args[0]));
 
@@ -59,7 +59,7 @@ class maxsum {
 
         int layer =0;
         int index =0;
-        
+
         while(sc.hasNextInt()){
 
             if(index == 0){
@@ -79,12 +79,12 @@ class maxsum {
 
     }
 
-    public static int max_wrapper(String filename){
+    public static int max(String filename){
 
-        triangle = new ArrayList<List<Integer>>(); 
+        triangle = new ArrayList<List<Integer>>();
         read_and_list(filename);
 
-        int maxvalue = max(0,0,0);
+        int maxvalue = max_wrapped(0,0,0);
 
         if(maxvalue == -1){
             System.out.println("There is no possible way reaching the end of pyramid! Prime numbers are blocking way.");
@@ -93,7 +93,7 @@ class maxsum {
         return maxvalue;
     }
 
-    public static int max(int layer,int index,int accumulated){
+    public static int max_wrapped(int layer,int index,int accumulated){
         if(index <0 || index > layer ){
             return -1;
         }
@@ -109,10 +109,10 @@ class maxsum {
         }
 
         accumulated += myvalue;
-        return Math.max( 
-               Math.max(      max(layer+1, index-1, accumulated) ,
-                              max(layer+1, index,   accumulated) ) , 
-                              max(layer+1, index+1, accumulated) )  ;
+
+        return Math.max(
+                max_wrapped(layer+1, index, accumulated) ,
+                max_wrapped(layer+1, index+1,   accumulated) ) ;
 
     }
 
@@ -120,32 +120,43 @@ class maxsum {
         triangle = new ArrayList<List<Integer>>();
         read_and_list(filename);
 
-        for(int i=triangle.size()-2; i >= 0; --i ){
+        int maxvalue = rollback_wrapped(filename);
+
+        if(maxvalue == -1){
+            System.out.println("There is no possible way reaching the end of pyramid! Prime numbers are blocking way.");
+        }
+        return maxvalue;
+    }
+
+    public static int rollback_wrapped(String filename){
+
+        for(int i=triangle.size()-1; i >= 0; --i ){
             for(int j=0; j<triangle.get(i).size(); ++j ){
-                if(prime(triangle.get(i).get(j)) ){
-                    triangle.get(i).set(j,0);
+
+                // -1 as blocked way.
+                if(prime(triangle.get(i).get(j))){
+                    triangle.get(i).set(j,-1);
                     continue;
                 }
 
-                int[] temp = {0,0,0};
+                // Last layer
+                if( i == triangle.size()-1){
+                    continue;
+                }
 
-                if( j-1 >= 0 ){
-                    int consider = triangle.get(i+1).get(j-1);
-                    if( !prime(consider) ){
-                        temp[0] = consider;
-                    }
+                // Bottom left, right and down values.
+                int[] temp = {0,0};
+
+                temp[0] = triangle.get(i+1).get(j+1);
+                temp[1] = triangle.get(i+1).get(j);
+
+                // Cannot reach end of pyramid
+                if(temp[0] == -1 &&temp[1] == -1){
+                    triangle.get(i).set(j,-1);
                 }
-                if( j+1 < triangle.get(i+1).size()){
-                    int consider = triangle.get(i+1).get(j+1);
-                    if( !prime(consider) ){
-                        temp[1] = consider;
-                    }
+                else {
+                    triangle.get(i).set(j, Math.max(temp[0], temp[1]) + triangle.get(i).get(j));
                 }
-                int consider = triangle.get(i+1).get(j);
-                if( !prime(consider) ){
-                    temp[2] = consider;
-                }
-                triangle.get(i).set(j,Math.max(Math.max(temp[0],temp[1]),temp[2]) + triangle.get(i).get(j));
             }
         }
 
